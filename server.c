@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
         int sockfd, newsockfd; //Entier de retour du socket
         struct sockaddr_in server_address , client_address;
         char buffer[256]; //Buffer de lecture
-
+	char bufferRep[32]; //buffer de réponse
 
         if (argc < 2) {
                  printf("ERROR, no port provided\n");
@@ -54,31 +54,35 @@ int main(int argc, char *argv[]) {
         int nombreB = buffer[4] | ( (int)buffer[5] << 8 ) | ( (int)buffer[6] << 16 ) | ( (int)buffer[7] << 24 );
         char op = buffer[8];
         int res;
-
+	printf("%d\n",nombreA);
+	printf("%d\n",nombreB);
+	printf("%c\n",op);
         if(op == '+') {
             res = nombreA+nombreB;
-            close(newsockfd);
         }
 
         else if(op == '-') {
             res = nombreA-nombreB;
-            close(newsockfd);
         }
 
         else if(op == '/') {
             res = nombreA/nombreB;
-            close(newsockfd);
         }
         else{
             printf("%s","erreur\n");
         }
 
-        buffer[0]= res & 0xff;
-        buffer[1]= (res >> 8) & 0xff;
-        buffer[2]= (res >> 16) & 0xff;
-        buffer[3]= (res >> 24) & 0xff;
 
-        n = write(newsockfd,buffer,256);
+        bufferRep[0]= res & 0xff;
+        bufferRep[1]= (res >> 8) & 0xff;
+        bufferRep[2]= (res >> 16) & 0xff;
+        bufferRep[3]= (res >> 24) & 0xff;
+	
+        int retourTest = bufferRep[0] | ( (int)bufferRep[1] << 8 ) | ( (int)bufferRep[2] << 16 ) | ( (int)bufferRep[3] << 24 );
+        // n = write(newsockfd,buffer,256);
+	printf("%d\n",retourTest);
+
+	send(newsockfd,(char*)bufferRep,4, 0);
 
     }
 
